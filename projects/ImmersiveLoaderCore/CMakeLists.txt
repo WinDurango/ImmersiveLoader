@@ -4,20 +4,27 @@ project(ImmersiveLoaderCore VERSION 1.0.0)
 set(VERSION_SUFFIX "-dev.1") # used for non-stable versions, otherwise blank
 set(CMAKE_CXX_STANDARD 23)
 
-find_package(pugixml CONFIG REQUIRED HINTS "${CMAKE_SOURCE_DIR}/vcpkg_installed/arm64-windows/share/pugixml")
+include(FetchContent)
+
+find_package(pugixml CONFIG REQUIRED)
+find_package(OpenSSL REQUIRED)
+FetchContent_Declare(spdlog GIT_REPOSITORY https://github.com/Cherrytree56567/spdlog.git GIT_TAG v1.x)
+FetchContent_MakeAvailable(spdlog)
 
 add_compile_definitions(WD_API_EXPORTS)
 
 set(FILES
     src/ImmersiveLoaderCore.cpp
+    src/main.cpp
 )
 
-add_library(ImmersiveLoaderCore SHARED ${FILES})
+#add_library(ImmersiveLoaderCore SHARED ${FILES})
+add_executable(ImmersiveLoaderCore ${FILES})
 target_include_directories(ImmersiveLoaderCore PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
 )
 
-target_link_libraries(ImmersiveLoaderCore PUBLIC pugixml::shared pugixml::pugixml)
+target_link_libraries(ImmersiveLoaderCore PUBLIC pugixml::shared pugixml::pugixml spdlog::spdlog OpenSSL::SSL OpenSSL::Crypto)
 
 target_compile_definitions(ImmersiveLoaderCore PUBLIC
     WINDURANGO_IMMERSIVELOADER_CORE_COMPILER_NAME="${CMAKE_CXX_COMPILER_ID}"
